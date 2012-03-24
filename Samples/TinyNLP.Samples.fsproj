@@ -41,14 +41,13 @@
   <ItemGroup>
     <Compile Include="Program.fs" />
     <None Include="App.config" />
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="FParsec, Version=0.9.1.1, Culture=neutral, PublicKeyToken=e5c8267bb3bd1265">
-      <Private>True</Private>
+    <Reference Include="FParsec">
+      <HintPath>..\..\mario\lib\FParsec.dll</HintPath>
     </Reference>
-    <Reference Include="FParsecCS, Version=0.9.1.1, Culture=neutral, PublicKeyToken=cba5b27b2682ab6b">
-      <Private>True</Private>
+    <Reference Include="FParsecCS">
+      <HintPath>..\..\mario\lib\FParsecCS.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=4.3.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">

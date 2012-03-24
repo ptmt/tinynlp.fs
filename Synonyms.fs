@@ -36,5 +36,5 @@ type WordItem (word : string, wordst : string, suff : string, part : LexicalClas
             | None -> empty_string
             | _ -> witem.Value.Word
     let getRelations (word_ids: int array) =
-        word_ids |> Array.map (fun x -> getWord x)
-    Kevo.Store.findByQuery<WordItem> query |> List.map (fun x -> getRelations x.Syn)
+        word_ids |> Array.map (fun x -> getWord x) |> List.ofArray
+    Kevo.Store.findByQuery<WordItem> query |> List.collect (fun x -> getRelations x.Syn) 
