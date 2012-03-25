@@ -55,7 +55,8 @@
   <ItemGroup>
     <Compile Include="NLPCore.fs" />
     <Compile Include="Tokenizer.fs" />
-    <Compile Include="Synonyms.fs" />
+    <Compile Include="Stemming.fs" />
+    <Compile Include="Synonymizer.fs" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>

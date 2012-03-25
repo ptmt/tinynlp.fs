@@ -68,6 +68,36 @@
 <member name="">
 
 </member>
+<member name="T:TinyNLP.Stemming">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
 <member name="">
 
 </member>
@@ -98,7 +128,46 @@
 <member name="">
 
 </member>
-<member name="T:TinyNLP.Synonyms">
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="T:TinyNLP.Synonymizer">
 
 </member>
 <member name="">
