@@ -14,5 +14,5 @@ let ``synonymizer should not be able to synonymize unknown word`` () =
     TinyNLP.Synonymizer.getSynonyms "adfadfa23" |> fun x -> x.Length = 0 |> shouldBeTrue
 
 [<Test>]
-let ``synonymizer should not be able to synonymize stemmed word`` () =
+let ``synonymizer should be able to synonymize stemmed word`` () =
     TinyNLP.Synonymizer.getSynonyms (TinyNLP.Stemming.Stem "слово") |> fun x -> x.Length > 1 |> shouldBeTrue

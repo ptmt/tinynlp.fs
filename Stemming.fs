@@ -68,7 +68,7 @@ let step4 word =
 
 let Stem (inword:string) =         
         let word = inword.ToLower().Trim().Replace("ё", "е");   
-        printfn "stemming %A" word // TODO LoggerAgent
+        //printfn "stemming %A" word // TODO LoggerAgent
         match isEnd word with
             | true -> word
             | false -> (RegexMatches(word, c_rvre).Item 0).Value |> step1 |> step2 |> step3 |> step4 
