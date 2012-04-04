@@ -13,10 +13,12 @@ type TokenType =
 
 // fucking simple
 //let sentenceDelimiter = pstring ". " <|> pstring "! " <|> pstring "? "
+let commasExtract (str:string) =
+    str.Replace(",", " ,")
 
 let tokenChars = manySatisfy (function ' '|'\t'| '\n' -> false | _ -> true) 
 
-let tokenDelimiter = pstring " " 
+let tokenDelimiter = pstring " "// <|> pstring ","
 
 let tokens = sepBy tokenChars tokenDelimiter
 
@@ -27,7 +29,7 @@ let t = pipe2
 let tokenizeParser = tokens //|>> (fun x -> printfn "%A" x)
 
 let tokenize (inputText:string)  =
-    match run tokenizeParser inputText with
+    match run tokenizeParser (commasExtract inputText) with
     | Success(result, _, _)   -> 
         Some(result)
     | Failure(errorMsg, _, _) -> 

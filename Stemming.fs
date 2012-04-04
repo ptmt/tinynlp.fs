@@ -66,33 +66,10 @@ let step4 word =
         | (false, w) -> w
         | (true, w) -> snd(RegexReplace(snd(RegexReplace(w, "ейше?", empty_string)), "нн$", "н"))
 
-let Stem (inword:string) = 
-        //let lowword = word.ToLower().Trim().Replace("ё", "е")
-        let word = inword.ToLower().Trim().Replace("ё", "е");
-   //     let rec instem word = 
-     //   printfn "%A" word
+let Stem (inword:string) =         
+        let word = inword.ToLower().Trim().Replace("ё", "е");   
+        printfn "stemming %A" word // TODO LoggerAgent
         match isEnd word with
             | true -> word
-            | false -> (RegexMatches(word, c_rvre).Item 0).Value |> step1 |> step2 |> step3 |> step4 //|> instem
-    //    instem lowword
-            
-        
-
-//             
-//
-//                // шаг 4
-//                if (!RegexReplace(ref rv, "ь$", string.Empty))
-//                {
-//                    RegexReplace(ref rv, "ейше?", string.Empty);
-//                    RegexReplace(ref rv, "нн$", "н");
-//                }
-//
-//                value = rv;      
-//                
-//            } while (false);
-//
-//            return value;
-//        }
-//
-//    }
-//}
+            | false -> (RegexMatches(word, c_rvre).Item 0).Value |> step1 |> step2 |> step3 |> step4 
+   
