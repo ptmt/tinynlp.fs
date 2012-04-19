@@ -8,17 +8,13 @@ type TokenClass =
     | Dash = 3
     | Other = 100
 
-// just for example
-//let skipWords = pstring "Нью-Йорк" <|> pstring "Рио-де-Жанейро"
 
-// fucking simple
-//let sentenceDelimiter = pstring ". " <|> pstring "! " <|> pstring "? "
 let commasExtractAndTrim (str:string) =
-    str.Replace(",", " ,").Trim() //.Replace(" ","")
+    str.Replace(",", " ,").Trim() 
 
-let tokenChars = manySatisfy (function ' '|'\t'| '\n' -> false | _ -> true) // | '\u0085' | '\u2028' | '\u2029' 
+let tokenChars = manySatisfy (function ' '|'\t'| '\n' -> false | _ -> true) 
 
-let tokenDelimiter = pchar ' ' <|>  pchar '\u0085' <|> pchar '\u2028' <|> pchar '\u2028' // | '\u2028' | '\u2029'  //pstring " "
+let tokenDelimiter = pchar ' ' <|>  pchar '\u0085' <|> pchar '\u2028' <|> pchar '\u2028' 
 
 let tokens = sepBy tokenChars tokenDelimiter
 
@@ -28,9 +24,7 @@ let tokenizeParser = tokens
 
 let tokenize (inputText:string)  =
     match run tokenizeParser (commasExtractAndTrim inputText) with
-    | Success(result, _, _)   -> 
-       //printfn "%A" (result.Item(0).ToCharArray() |> Array.map (fun x -> (int)x))
-      //  printfn "%A" (System.Text.Encoding.UTF8.GetBytes result.Head)
+    | Success(result, _, _)   ->        
         printfn "%A" result
         Some(result)
     | Failure(errorMsg, _, _) -> 

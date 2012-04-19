@@ -19,3 +19,9 @@ D:\projects\tinynlp.fs\Samples\obj\Debug\Samples.exe
 D:\projects\tinynlp.fs\Samples\obj\Debug\Samples.pdb
 D:\projects\tinynlp.fs\Samples\bin\Debug\FParsec.dll
 D:\projects\tinynlp.fs\Samples\bin\Debug\FParsecCS.dll
+D:\projects\tinynlp.fs\Samples\bin\Debug\Newtonsoft.Json.dll
+D:\projects\tinynlp.fs\Samples\bin\Debug\Newtonsoft.Json.pdb
+D:\projects\tinynlp.fs\Samples\bin\Debug\Newtonsoft.Json.xml
+D:\projects\tinynlp.fs\Samples\bin\Debug\postagger.dll
+D:\projects\tinynlp.fs\Samples\bin\Debug\postagger.pdb
+D:\projects\tinynlp.fs\Samples\bin\Debug\postagger.xml
