@@ -39,7 +39,9 @@ let duration f =
 
 let cor = 
     use f = System.IO.File.OpenRead("annot.opcorpora.xml")
-    printfn "%A" (TinyNLP.POST.Corpus.readCorpus f)
+    let corpus_data = TinyNLP.POST.Corpus.readCorpus f
+    let lambdas = TinyNLP.POST.Model.calculateLambdas corpus_data
+    printfn "%A" lambdas
 
 duration (fun () -> cor)
 
