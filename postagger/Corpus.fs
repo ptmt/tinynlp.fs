@@ -79,9 +79,9 @@ let handleSentence (sentence:TaggedWord list, corpus_data:CorpusData):CorpusData
 
     handleWord (corpus_data, 0)
 
-let readCorpus (input_stream:System.IO.Stream) =    
+let readCorpus (input:System.IO.StreamReader) =    
    
-    use xmlReader = System.Xml.XmlReader.Create(input_stream)   
+    use xmlReader = System.Xml.XmlReader.Create(input)   
     seq {
         while xmlReader.ReadToFollowing("sentence") do
             yield xmlReader.ReadSubtree()
@@ -91,15 +91,3 @@ let readCorpus (input_stream:System.IO.Stream) =
                 Bigrams =  new Dictionary<string, int>(); 
                 Trigrams =  new Dictionary<string, int>()}
 
-
-//
-// public void handleSentence(List<TaggedWord> sentence) {
-//			for (int i = 0; i < sentence.size(); ++i) {
-//				addLexiconEntry(sentence.get(i));
-//				addUniGram(sentence, i);
-//				if (i > 0)
-//					addBiGram(sentence, i);
-//				if (i > 1)
-//					addTriGram(sentence, i);
-//			}
-//		}  

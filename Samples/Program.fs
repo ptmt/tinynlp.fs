@@ -37,12 +37,14 @@ let duration f =
 
 //printfn "stem %A" (duration (fun () -> stemSample input_string))
 
-let cor = 
-    use f = System.IO.File.OpenRead("annot.opcorpora.xml")
+let cor =    
+    use f = System.IO.File.OpenText("annot.opcorpora.xml")
     let corpus_data = TinyNLP.POST.Corpus.readCorpus f
+    
     let lambdas = TinyNLP.POST.Model.calculateLambdas corpus_data
     let sf = TinyNLP.POST.Suffix.buildSuffixTree corpus_data
-    printfn "%A" sf
+    
+    printfn "%A" corpus_data
 
 duration (fun () -> cor)
 

@@ -19,7 +19,9 @@ type SuffixTree = {
 
 
 let tagsOfTreeNode (tags, _, _) = tags
-let chOfTreeNode (ch, _, _) = ch
+let chOfTreeNode (_, ch, _) = ch
+let probOfTreeNode (_, _, i) = i
+
 let fstn = function 
     | Node(f, _) -> f
 
@@ -59,18 +61,28 @@ let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) =
 
     {Unigrams = unigrams; Root = getInitRoot; MaxLength = MAX_LENGTH; Theta = theta}
 
-let addSuffix (node:TreeNode Tree, suffix:string, tags:dict) =     
+let rec addSuffix (node:TreeNode Tree, suffix:string, tags:dict) =         
     let transitionChar = suffix.ToCharArray().[0]
-    printfn "%A" transitionChar
+//    Util.append_log (sprintf "char: %A" transitionChar)
 //    if isChildrensContains (node, transitionChar) = false then
 //        printfn "no ch"
 //    else
 //        printfn "add new"
-    Node (fstn node, ((sndn node) @ [Node((new dict(), transitionChar, 10), [])]) )
-//if !d_children.containsKey(transitionChar)
-//	d_children.put(transitionChar, new TreeNode());
-//d_children.get(transitionChar).addSuffix(reverseSuffix.substring(1), tagFreqs);
-   
+    let childrens = sndn node
+    let new_children = Node((new dict(), transitionChar, 10), []) //addSuffix(node, suffix.Substring(1), tags)
+    Node (fstn node, (childrens @ [new_children]) )
+
+let printSuffixTree (stree: SuffixTree) = 
+    let level2str level = 
+        if level = 0 then ""
+        else
+            [0..level] |> List.fold (fun a x -> a + "\t") ""
+
+    let rec loop (node: TreeNode Tree, level:int) = 
+        match node with 
+            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (probOfTreeNode a)
+            | Node (a, xs) -> xs |> List.fold (fun acc x -> acc + loop (x, level + 1)) ""
+    loop (stree.Root, 0)
     
 let buildSuffixTree (corpus_data:CorpusData) = 
         let caclulateTheta =
@@ -82,23 +94,16 @@ let buildSuffixTree (corpus_data:CorpusData) =
             System.Math.Sqrt (stdDevSum / float (corpus_data.Unigrams.Count - 1))
 
         let wordProc (lex:string, tags:Dictionary<string, int>, suffix_tree:SuffixTree) = 
-            printfn "%A" lex
+           // Util.append_log (sprintf "lex: %A" lex)
             let wordFreq = tags.Values |> Seq.fold (fun a x -> a + x) 0
-            //addWord suffix_tree lex tags
             let reverse = reverseStr lex
-            //printfn "%A" <| addSuffix (suffix_tree.Root, reverse, tags)
             {Unigrams = suffix_tree.Unigrams; Root = addSuffix (suffix_tree.Root, reverse, tags); MaxLength = MAX_LENGTH; Theta = suffix_tree.Theta}
 
-//			// Add transition.
-//			Character transitionChar = reverseSuffix.charAt(0);
-//			if (!d_children.containsKey(transitionChar))
-//				d_children.put(transitionChar, new TreeNode());
-//			d_children.get(transitionChar).addSuffix(reverseSuffix.substring(1), tagFreqs);
-//
   
         let theta = caclulateTheta         
         let suffix_tree = getEmptySuffixTree (corpus_data.Unigrams, theta, 10)
-        //suffix_tree
-        corpus_data.Lexicon |>  Seq.fold (fun a x -> wordProc ((string x.Key), x.Value, a)) suffix_tree
-
+        Util.append_log (sprintf "%A" (printSuffixTree (suffix_tree)))
+        let news = corpus_data.Lexicon |>  Seq.fold (fun a x -> wordProc ((string x.Key), x.Value, a)) suffix_tree
+        Util.append_log (sprintf "%A" (printSuffixTree (news)))
+        news
 
