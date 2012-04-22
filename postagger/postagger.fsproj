@@ -45,6 +45,7 @@
     <Compile Include="Trainer.fs" />
     <Compile Include="Corpus.fs" />
     <Compile Include="Model.fs" />
+    <Compile Include="Suffix.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

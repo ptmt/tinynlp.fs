@@ -6,7 +6,7 @@ type TaggedWord = string * string
 
 
 type CorpusData = {
-    Lexicon:Dictionary<string, int>;
+    Lexicon:Dictionary<string, Dictionary<string, int>>;
     Unigrams:Dictionary<string, int>;
     Bigrams:Dictionary<string, int>;
     Trigrams:Dictionary<string, int>
@@ -48,6 +48,15 @@ let inline incDict (dict:Dictionary<'a, int>, key:'a) =
 let handleSentence (sentence:TaggedWord list, corpus_data:CorpusData):CorpusData = 
     
     let rec handleWord (c:CorpusData,i:int) =
+        let getLexicon (dict:Dictionary<string, Dictionary<string, int>>, word:TaggedWord) = 
+            if dict.ContainsKey(fst word) then 
+                dict.[fst word] <- incDict (dict.[fst word], snd word)
+            else
+                let innerDict = new Dictionary<string, int>()
+                innerDict.Add(snd word, 1)
+                dict.[fst word] <- innerDict
+            dict
+                
         let getBigrams = 
             if (i > 0) then
                 incDict (c.Bigrams, ( (snd sentence.[i - 1]) + delimiter + (snd sentence.[i]) ));
@@ -61,7 +70,11 @@ let handleSentence (sentence:TaggedWord list, corpus_data:CorpusData):CorpusData
         if i = sentence.Length - 1 then
             c
         else            
-            let corpusd = {Lexicon = incDict (c.Lexicon, taggedToStr sentence.[i]); Unigrams =  incDict (c.Unigrams, (snd sentence.[i])); Bigrams =  getBigrams; Trigrams = getTrigrams;}
+            let corpusd = {
+                Lexicon = getLexicon (c.Lexicon, sentence.[i]);
+                Unigrams =  incDict (c.Unigrams, (snd sentence.[i]));
+                Bigrams =  getBigrams;
+                Trigrams = getTrigrams;}
             handleWord (corpusd , i+1)  
 
     handleWord (corpus_data, 0)
@@ -73,7 +86,7 @@ let readCorpus (input_stream:System.IO.Stream) =
         while xmlReader.ReadToFollowing("sentence") do
             yield xmlReader.ReadSubtree()
         } |> Seq.fold (fun corpus_data sentence_tree -> handleSentence ((readSentence sentence_tree), corpus_data))
-                {Lexicon =  new Dictionary<string, int>(); 
+                {Lexicon =  new Dictionary<string, Dictionary<string, int>>(); 
                 Unigrams =  new Dictionary<string, int>(); 
                 Bigrams =  new Dictionary<string, int>(); 
                 Trigrams =  new Dictionary<string, int>()}

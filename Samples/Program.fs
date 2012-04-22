@@ -41,7 +41,8 @@ let cor =
     use f = System.IO.File.OpenRead("annot.opcorpora.xml")
     let corpus_data = TinyNLP.POST.Corpus.readCorpus f
     let lambdas = TinyNLP.POST.Model.calculateLambdas corpus_data
-    printfn "%A" lambdas
+    let sf = TinyNLP.POST.Suffix.buildSuffixTree corpus_data
+    printfn "%A" sf
 
 duration (fun () -> cor)
 
