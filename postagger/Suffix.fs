@@ -19,22 +19,12 @@ type ChTree = {
 type TO = ChTree option 
 let empty : TO = None
 
+
 type SuffixTree = {
       Unigrams : Dictionary<string, int>;
       Tree: TO;
       MaxLength: int;
       Theta: float }
-
-
-//let tagsOfTreeNode (tags, _, _) = tags
-//let chOfTreeNode (_, ch, _) = ch
-//let freqOfTreeNode (_, _, i) = i
-//
-//let fstn = function 
-//    | Node(f, _) -> f
-//
-//let sndn = function
-//    | Node(_, s) -> s
 
 let cardinalPattern = "^([0-9]+)|([0-9]+\\.)|([0-9.,:-]+[0-9]+)|([0-9]+[a-zA-Z]{1,3})$"
 let MAX_LENGTH = 10
@@ -47,13 +37,15 @@ let reverseStr str =
     else
         new string(s)
 
-//let isChildrensContains (node: TreeNode Tree, ch: char) = 
-//    match node with
-//    | Node (_, []) -> false
-//    | Node ((_, c, _), xs) -> 
-//        let l = xs |> List.filter (fun x -> c = ch) 
-//        if l.Length > 0 then true else false
-            
+let mergedict (dict1:dict, dict2:dict) = 
+    let mergein (a:dict) (x:KeyValuePair<string,int>) = 
+        if a.ContainsKey (x.Key) then
+            a.[x.Key] <- x.Value + a.[x.Key]
+            a
+        else
+            filldict (a, x.Key, x.Value)
+
+    dict1 |> Array.ofSeq |> Array.fold mergein dict2      
     
 let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) = 
     let filldict (dict:Dictionary<string, int>, a:string, b:int) = 
@@ -67,40 +59,40 @@ let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) =
 
     {Unigrams = unigrams; Tree = getInitRoot; MaxLength = MAX_LENGTH; Theta = theta}
 
+let sumdict (dict:dict) = 
+    dict |> Seq.fold (fun accum x -> accum + x.Value) 0
+
 let rec addSuffix (tree:TO, suffix:string, tags:dict) =         
-    if suffix.Length = 0 then None
+    if suffix.Length = 0 then {Map = Map.empty; Freqs = null; TotalFreq = 0}
     else
         let transitionChar = suffix.ToCharArray().[0]
         match tree with 
-                | None -> None
-                | Some tree ->
+                | None -> // пустое дерево в которое нужно добавить и добавление вершины в новую букву (новое сочетание букв)
+                    let subNode = addSuffix (None, suffix.Substring(1), tags)
+                    let map = Map.empty $ Map.add transitionChar subNode
+                    {Map=map; Freqs = tags; TotalFreq = sumdict tags}
+                | Some tree -> 
                      match tree.Map.TryFind transitionChar with
-                        | None ->  //let subNode = None $ insert (i+1)
-                                   let map = tree.Map $ Map.add transitionChar None
-                                   {Map=map; Freqs = new dict(); TotalFreqs = 0}
-                        | Some subNode ->  
-                                   let map = tree.Map $ Map.add transitionChar None
-                                   {Map=map; Freqs = new dict(); TotalFreqs = 0}
-//    Util.append_log (sprintf "char: %A" transitionChar)
-//    if isChildrensContains (node, transitionChar) = false then
-//        printfn "no ch"
-//    else
-//        printfn "add new"
-//        let childrens = sndn node
-//        let new_children = Node((new dict(), transitionChar, 10), []) //addSuffix(node, suffix.Substring(1), tags)
-//        Node (fstn node, (childrens @ [new_children]) )
+                        // такой буквы ещё нет, добавляем по ней поддерево, добавляем её в хэш, возвращаем ноду с новым хэшем, частотами
+                        | None ->  let subNode = addSuffix (None, suffix.Substring(1), tags)
+                                   let map = tree.Map $ Map.add transitionChar subNode
+                                   {Map=map; Freqs = tags; TotalFreq = sumdict tags}
+                        // такая буква уже есть, сливаем хэши 
+                        | Some subNode ->                                     
+                                   let mergedTags = mergedict (tags, subNode.Freqs)
+                                   {Map=tree.Map; Freqs = mergedTags; TotalFreq = sumdict mergedTags}
 
-let printSuffixTree (stree: SuffixTree) = 
-    let level2str level = 
-        if level = 0 then ""
-        else
-            [0..level] |> List.fold (fun a x -> a + "\t") ""
-
-    let rec loop (node: TreeNode Tree, level:int) = 
-        match node with 
-            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (freqOfTreeNode a)
-            | Node (a, xs) -> xs |> List.fold (fun acc x -> acc + loop (x, level + 1)) ""
-    loop (stree.Root, 0)
+//let printSuffixTree (stree: SuffixTree) = 
+//    let level2str level = 
+//        if level = 0 then ""
+//        else
+//            [0..level] |> List.fold (fun a x -> a + "\t") ""
+//
+//    let rec loop (node: TreeNode Tree, level:int) = 
+//        match node with 
+//            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (freqOfTreeNode a)
+//            | Node (a, xs) -> xs |> List.fold (fun acc x -> acc + loop (x, level + 1)) ""
+//    loop (stree.Root, 0)
     
 let buildSuffixTree (corpus_data:CorpusData) = 
         let caclulateTheta =
@@ -115,13 +107,13 @@ let buildSuffixTree (corpus_data:CorpusData) =
            // Util.append_log (sprintf "lex: %A" lex)
             let wordFreq = tags.Values |> Seq.fold (fun a x -> a + x) 0
             let reverse = reverseStr lex
-            {Unigrams = suffix_tree.Unigrams; Root = addSuffix (suffix_tree.Root, reverse, tags); MaxLength = MAX_LENGTH; Theta = suffix_tree.Theta}
+            {Unigrams = suffix_tree.Unigrams; Tree = Some(addSuffix (suffix_tree.Tree, reverse, tags)); MaxLength = MAX_LENGTH; Theta = suffix_tree.Theta}
 
   
         let theta = caclulateTheta         
         let suffix_tree = getEmptySuffixTree (corpus_data.Unigrams, theta, 10)
-        Util.append_log (sprintf "%A" (printSuffixTree (suffix_tree)))
+       // Util.append_log (sprintf "%A" (printSuffixTree (suffix_tree)))
         let news = corpus_data.Lexicon |>  Seq.fold (fun a x -> wordProc ((string x.Key), x.Value, a)) suffix_tree
-        Util.append_log (sprintf "%A" (printSuffixTree (news)))
+       // Util.append_log (sprintf "%A" (printSuffixTree (news)))
         news
 
