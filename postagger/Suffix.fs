@@ -5,48 +5,54 @@ open System.Collections.Generic
 
 type dict = Dictionary<string, int>
 
-type 'a Tree = Node of 'a  * 'a Tree list
+//type 'a Tree = Node of 'a  * 'a Tree list
 
 type TreeNode =    
-    Dictionary<string, int> * char * int 
+    Dictionary<string, int> * int 
 
+type ChTree = {
+     Map : Map<char, ChTree> 
+     Freqs : Dictionary<string, int>
+     TotalFreq : int
+   }
+ 
+type TO = ChTree option 
+let empty : TO = None
 
 type SuffixTree = {
       Unigrams : Dictionary<string, int>;
-      Root: TreeNode Tree;
+      Tree: TO;
       MaxLength: int;
       Theta: float }
 
 
-let tagsOfTreeNode (tags, _, _) = tags
-let chOfTreeNode (_, ch, _) = ch
-let probOfTreeNode (_, _, i) = i
-
-let fstn = function 
-    | Node(f, _) -> f
-
-let sndn = function
-    | Node(_, s) -> s
+//let tagsOfTreeNode (tags, _, _) = tags
+//let chOfTreeNode (_, ch, _) = ch
+//let freqOfTreeNode (_, _, i) = i
+//
+//let fstn = function 
+//    | Node(f, _) -> f
+//
+//let sndn = function
+//    | Node(_, s) -> s
 
 let cardinalPattern = "^([0-9]+)|([0-9]+\\.)|([0-9.,:-]+[0-9]+)|([0-9]+[a-zA-Z]{1,3})$"
 let MAX_LENGTH = 10
 let MAX_SUFFIX_LENGTH = 2
 
-let reverseStr str = 
-//    if str = "" then ""
-//    else        
+let reverseStr str =       
     let s = (string str).ToCharArray() |> Array.rev     
     if s.Length > MAX_SUFFIX_LENGTH then
         (new string(s)).Substring(0, MAX_SUFFIX_LENGTH)
     else
         new string(s)
 
-let isChildrensContains (node: TreeNode Tree, ch: char) = 
-    match node with
-    | Node (_, []) -> false
-    | Node ((_, c, _), xs) -> 
-        let l = xs |> List.filter (fun x -> c = ch) 
-        if l.Length > 0 then true else false
+//let isChildrensContains (node: TreeNode Tree, ch: char) = 
+//    match node with
+//    | Node (_, []) -> false
+//    | Node ((_, c, _), xs) -> 
+//        let l = xs |> List.filter (fun x -> c = ch) 
+//        if l.Length > 0 then true else false
             
     
 let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) = 
@@ -57,20 +63,32 @@ let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) =
     let getInitRoot = 
         let dict = unigrams |> Seq.fold (fun accum x -> filldict (accum, x.Key, x.Value)) (new Dictionary<string, int>())
         let freq = unigrams |> Seq.fold (fun accum x -> accum + x.Value) 0
-        Node((dict, char 0, freq), [])
+        Some {Map = Map.empty; Freqs = dict; TotalFreq = freq}
 
-    {Unigrams = unigrams; Root = getInitRoot; MaxLength = MAX_LENGTH; Theta = theta}
+    {Unigrams = unigrams; Tree = getInitRoot; MaxLength = MAX_LENGTH; Theta = theta}
 
-let rec addSuffix (node:TreeNode Tree, suffix:string, tags:dict) =         
-    let transitionChar = suffix.ToCharArray().[0]
+let rec addSuffix (tree:TO, suffix:string, tags:dict) =         
+    if suffix.Length = 0 then None
+    else
+        let transitionChar = suffix.ToCharArray().[0]
+        match tree with 
+                | None -> None
+                | Some tree ->
+                     match tree.Map.TryFind transitionChar with
+                        | None ->  //let subNode = None $ insert (i+1)
+                                   let map = tree.Map $ Map.add transitionChar None
+                                   {Map=map; Freqs = new dict(); TotalFreqs = 0}
+                        | Some subNode ->  
+                                   let map = tree.Map $ Map.add transitionChar None
+                                   {Map=map; Freqs = new dict(); TotalFreqs = 0}
 //    Util.append_log (sprintf "char: %A" transitionChar)
 //    if isChildrensContains (node, transitionChar) = false then
 //        printfn "no ch"
 //    else
 //        printfn "add new"
-    let childrens = sndn node
-    let new_children = Node((new dict(), transitionChar, 10), []) //addSuffix(node, suffix.Substring(1), tags)
-    Node (fstn node, (childrens @ [new_children]) )
+//        let childrens = sndn node
+//        let new_children = Node((new dict(), transitionChar, 10), []) //addSuffix(node, suffix.Substring(1), tags)
+//        Node (fstn node, (childrens @ [new_children]) )
 
 let printSuffixTree (stree: SuffixTree) = 
     let level2str level = 
@@ -80,7 +98,7 @@ let printSuffixTree (stree: SuffixTree) =
 
     let rec loop (node: TreeNode Tree, level:int) = 
         match node with 
-            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (probOfTreeNode a)
+            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (freqOfTreeNode a)
             | Node (a, xs) -> xs |> List.fold (fun acc x -> acc + loop (x, level + 1)) ""
     loop (stree.Root, 0)
     
