@@ -11,8 +11,14 @@ type TE = {
 
 type TagMatrix = TE list list
 
-let viterbi (token_list:string list) = 
-    tokents |> List.map ()
+let viterbi (token_list:string list, known_words_tags_probs:TinyNLP.POST.Word.mapprobs) = 
+    let viterbi_token (token:string) = 
+        let columnHighestProb = System.Double.NegativeInfinity
+        let a = known_words_tags_probs.TryGetValue(token.ToLower())
+        match a with 
+            | (false, _) -> raise (new System.NotImplementedException())
+            | (true, tag) ->  raise (new System.NotImplementedException()) // |> List.map (fun x -> 
+    token_list |> List.map (fun x -> viterbi_token x)
 //    List<List<TagMatrixEntry>> tagMatrix = new ArrayList<List<TagMatrixEntry>>(sentence.size());
 //
 //		int startTag = d_model.tagNumbers().get(sentence.get(0));

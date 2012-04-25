@@ -117,3 +117,14 @@ let buildSuffixTree (corpus_data:CorpusData) =
        // Util.append_log (sprintf "%A" (printSuffixTree (news)))
         news
 
+let suffixTagProbs (word:string) (suffix_tree:SuffixTree) = 
+    let _suffixTagProbs (lex:string) (Dictionary<int, double>) = 
+        printfn "adf"
+        
+    let reverse = reverseStr lex
+    _suffixTagProbs reverse (new Dictionary<int, double>())
+//
+//		if (reverseWord.length() > d_maxLength)
+//			reverseWord = reverseWord.substring(0, d_maxLength);
+//
+//		return d_root.suffixTagProbs(reverseWord, new HashMap<Integer, Double>());
