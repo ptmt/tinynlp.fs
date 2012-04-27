@@ -26,16 +26,22 @@ type SuffixTree = {
       MaxLength: int;
       Theta: float }
 
+let inline private ($) a b = b a
 let cardinalPattern = "^([0-9]+)|([0-9]+\\.)|([0-9.,:-]+[0-9]+)|([0-9]+[a-zA-Z]{1,3})$"
 let MAX_LENGTH = 10
 let MAX_SUFFIX_LENGTH = 2
 
-let reverseStr str =       
+let inline reverseStr str =       
     let s = (string str).ToCharArray() |> Array.rev     
     if s.Length > MAX_SUFFIX_LENGTH then
         (new string(s)).Substring(0, MAX_SUFFIX_LENGTH)
     else
         new string(s)
+
+let inline filldict (dict:dict) (a:string) (b:int) = 
+        dict.Add(a, b)
+        dict
+           
 
 let mergedict (dict1:dict, dict2:dict) = 
     let mergein (a:dict) (x:KeyValuePair<string,int>) = 
@@ -43,21 +49,21 @@ let mergedict (dict1:dict, dict2:dict) =
             a.[x.Key] <- x.Value + a.[x.Key]
             a
         else
-            filldict (a, x.Key, x.Value)
+            filldict a x.Key x.Value
 
     dict1 |> Array.ofSeq |> Array.fold mergein dict2      
-    
+
+
 let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) = 
-    let filldict (dict:Dictionary<string, int>, a:string, b:int) = 
-        dict.Add(a, b)
-        dict
+    
 
     let getInitRoot = 
-        let dict = unigrams |> Seq.fold (fun accum x -> filldict (accum, x.Key, x.Value)) (new Dictionary<string, int>())
+        let dict = unigrams |> Seq.fold (fun accum x -> filldict accum x.Key x.Value) (new Dictionary<string, int>())
         let freq = unigrams |> Seq.fold (fun accum x -> accum + x.Value) 0
         Some {Map = Map.empty; Freqs = dict; TotalFreq = freq}
 
     {Unigrams = unigrams; Tree = getInitRoot; MaxLength = MAX_LENGTH; Theta = theta}
+    
 
 let sumdict (dict:dict) = 
     dict |> Seq.fold (fun accum x -> accum + x.Value) 0
@@ -82,17 +88,11 @@ let rec addSuffix (tree:TO, suffix:string, tags:dict) =
                                    let mergedTags = mergedict (tags, subNode.Freqs)
                                    {Map=tree.Map; Freqs = mergedTags; TotalFreq = sumdict mergedTags}
 
-//let printSuffixTree (stree: SuffixTree) = 
-//    let level2str level = 
-//        if level = 0 then ""
-//        else
-//            [0..level] |> List.fold (fun a x -> a + "\t") ""
-//
-//    let rec loop (node: TreeNode Tree, level:int) = 
-//        match node with 
-//            | Node (a, []) -> "\n" + level2str level + string (chOfTreeNode a) + " freq:" + string (freqOfTreeNode a)
-//            | Node (a, xs) -> xs |> List.fold (fun acc x -> acc + loop (x, level + 1)) ""
-//    loop (stree.Root, 0)
+//let emptydict = new dict()
+//let f = addSuffix (empty, (reverseStr "плов"), filldict emptydict "a" 2 ) 
+//let f2 = addSuffix (Some f, (reverseStr "кров"), filldict emptydict "b" 3) 
+//let f3 = addSuffix (Some f2, (reverseStr "срыв"), filldict emptydict "c" 1) 
+//f3 |> printfn "%A" 
     
 let buildSuffixTree (corpus_data:CorpusData) = 
         let caclulateTheta =
@@ -117,14 +117,39 @@ let buildSuffixTree (corpus_data:CorpusData) =
        // Util.append_log (sprintf "%A" (printSuffixTree (news)))
         news
 
-let suffixTagProbs (word:string) (suffix_tree:SuffixTree) = 
-    let _suffixTagProbs (lex:string) (Dictionary<int, double>) = 
-        printfn "adf"
-        
-    let reverse = reverseStr lex
-    _suffixTagProbs reverse (new Dictionary<int, double>())
+let suffixTagProbs (word:string) (suffix_tree:SuffixTree) (theta:float) (corpus_data:CorpusData)= 
+    let bayesianInversion (probs: Dictionary<string, float>) =
+        //let inverseTagProbs = new Dictionary<string, float>
+        probs |> Seq.fold (fun (a:Dictionary<string, float>) x -> a.Add(x.Key, x.Value / float corpus_data.Unigrams.[x.Key]); a) (new Dictionary<string, float>())
+//        Map<Integer, Double> inverseTagProbs = new HashMap<Integer, Double>();
 //
-//		if (reverseWord.length() > d_maxLength)
-//			reverseWord = reverseWord.substring(0, d_maxLength);
+//		for (Entry<Integer, Double> tagProb: tagProbs.entrySet()) {
+//			Integer tag = tagProb.getKey();
+//			Double value = tagProb.getValue();
 //
-//		return d_root.suffixTagProbs(reverseWord, new HashMap<Integer, Double>());
+//			inverseTagProbs.put(tag, value / d_uniGrams.get(new UniGram(tag)));
+//		}
+//
+//		return inverseTagProbs;
+    let rec _suffixTagProbs (lex:string) (probs: Dictionary<string, float>) (node: ChTree)= 
+        let tagFreqProcess (p:Dictionary<string, float>) (x:string) = 
+            //P(t|reverseSuffix)
+            let pt = if node.Freqs.ContainsKey x then float node.Freqs.[x] / (float node.TotalFreq) else 0.0            
+            let a =  theta * probs.[x]
+            p.[x] <- (a + pt) / (theta + 1.0)
+            p
+
+        let newprobs = suffix_tree.Tree.Value.Freqs |> Seq.fold (fun p x -> tagFreqProcess p x.Key) probs
+        if lex.Length = 0 then
+            bayesianInversion probs
+        else
+            let transitionChar = lex.[0]
+            if node.Map.ContainsKey(transitionChar) = false then 
+                bayesianInversion probs
+            else
+                _suffixTagProbs (lex.Substring(1)) newprobs node.Map.[transitionChar]
+
+    let reverse = reverseStr word
+    _suffixTagProbs reverse (new Dictionary<string, float>()) suffix_tree.Tree.Value
+//
+
