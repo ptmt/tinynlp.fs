@@ -50,7 +50,11 @@ let mergedict (dict1:dict, dict2:dict) =
             a
         else
             filldict a x.Key x.Value
-    dict1 |> Array.ofSeq |> Array.fold mergein dict2      
+
+    match dict1, dict2 with
+        | (null, _) -> dict2
+        | (_, null) -> dict1
+        | (_, _) -> dict1 |> Array.ofSeq |> Array.fold mergein dict2      
 
 
 let getEmptySuffixTree (unigrams:Dictionary<string,int>, theta, maxLength) = 
@@ -107,20 +111,20 @@ let buildSuffixTree (corpus_data:CorpusData) =
         let theta = caclulateTheta corpus_data        
         let suffix_tree = getEmptySuffixTree (corpus_data.Unigrams, theta, 10)
        // Util.append_log (sprintf "%A" (printSuffixTree (suffix_tree)))
-        let news = corpus_data.Lexicon |>  Seq.fold (fun a x -> wordProc ((string x.Key), x.Value, a)) suffix_tree
+        let news = corpus_data.Lexicon |>  Seq.fold (fun a x -> wordProc (x.Key.ToLower(), x.Value, a)) suffix_tree
        // Util.append_log (sprintf "%A" (printSuffixTree (news)))
         news
 
-let suffixTagProbs (word:string) (suffix_tree:SuffixTree) (theta:float) (corpus_data:CorpusData)= 
+let suffixTagProbs (word:string) (suffix_tree:SuffixTree) (corpus_data:CorpusData)= 
     let bayesianInversion (probs: Dictionary<string, float>) =
         probs |> Seq.fold (fun (a:Dictionary<string, float>) x -> a.Add(x.Key, x.Value / float corpus_data.Unigrams.[x.Key]); a) (new Dictionary<string, float>())
 
     let rec _suffixTagProbs (lex:string) (probs: Dictionary<string, float>) (node: ChTree)= 
         let tagFreqProcess (p:Dictionary<string, float>) (x:string) = 
             //P(t|reverseSuffix)
-            let pt = if node.Freqs.ContainsKey x then float node.Freqs.[x] / (float node.TotalFreq) else 0.0            
-            let a =  theta * probs.[x]
-            p.[x] <- (a + pt) / (theta + 1.0)
+            let pt = if node.Freqs <> null && node.Freqs.ContainsKey x then float node.Freqs.[x] / (float node.TotalFreq) else 0.0            
+            let a =  if p.ContainsKey x then suffix_tree.Theta * p.[x] else 0.0
+            p.[x] <- (a + pt) / (suffix_tree.Theta + 1.0)
             p
 
         let newprobs = suffix_tree.Tree.Value.Freqs |> Seq.fold (fun p x -> tagFreqProcess p x.Key) probs

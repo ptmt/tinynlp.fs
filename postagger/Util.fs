@@ -8,3 +8,4 @@ let append_log str =
 let inline addToDict (dict:System.Collections.Generic.Dictionary<'a, 'b>) (key:'a) (value:'b) = 
     dict.Add(key, value)
     dict
+
