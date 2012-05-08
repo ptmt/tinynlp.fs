@@ -42,9 +42,10 @@ let cor =
     let corpus_data = TinyNLP.POST.Corpus.readCorpus f
     
     let lambdas = TinyNLP.POST.Model.calculateLambdas corpus_data
+    Util.append_log (sprintf "lambdas: %A" lambdas)
     let sf = TinyNLP.POST.Suffix.buildSuffixTree corpus_data
     let mp = TinyNLP.POST.Word.getWordProbs corpus_data
-    let a = TinyNLP.POST.Tagger.viterbi ["<S>";"привет"; "всем";"</S>"] mp sf corpus_data
+    let a = TinyNLP.POST.Tagger.viterbi ["<S>";"привет"; "всем";"берегам"; ","; "морям";"</S>"] mp sf corpus_data
     let b = TinyNLP.POST.Tagger.highestProbabilitySequence a
     Util.append_log (sprintf "%A" ( TinyNLP.POST.Tagger.printTagMatrix a))
     Util.append_log (sprintf "answer: %A" b)
