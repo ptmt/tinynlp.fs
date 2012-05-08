@@ -10,6 +10,7 @@ let duration f =
     let timer = new System.Diagnostics.Stopwatch()
     timer.Start()
     let returnValue = f()
+    timer.Stop()
     printfn "%A Ellapsed Time: %f ms" (f.GetType().ToString()) timer.Elapsed.TotalMilliseconds
     returnValue 
 //
@@ -42,12 +43,12 @@ let cor =
     let corpus_data = TinyNLP.POST.Corpus.readCorpus f
     
     let lambdas = TinyNLP.POST.Model.calculateLambdas corpus_data
-    Util.append_log (sprintf "lambdas: %A" lambdas)
+  //  Util.append_log (sprintf "lambdas: %A" lambdas)
     let sf = TinyNLP.POST.Suffix.buildSuffixTree corpus_data
     let mp = TinyNLP.POST.Word.getWordProbs corpus_data
-    let a = TinyNLP.POST.Tagger.viterbi ["<S>";"привет"; "всем";"берегам"; ","; "морям";"</S>"] mp sf corpus_data
+    let a = TinyNLP.POST.Tagger.viterbi ["<S>";"привет"; "всем";"берегам"; ","; "морям";"</S>"] (corpus_data, sf, mp)
     let b = TinyNLP.POST.Tagger.highestProbabilitySequence a
-    Util.append_log (sprintf "%A" ( TinyNLP.POST.Tagger.printTagMatrix a))
+  //  Util.append_log (sprintf "%A" ( TinyNLP.POST.Tagger.printTagMatrixHashes a))
     Util.append_log (sprintf "answer: %A" b)
     //printfn "%A" sf
     //printfn "%A" mp

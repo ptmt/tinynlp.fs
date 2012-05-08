@@ -1,5 +1,8 @@
 ﻿module Util
 
+open System.Runtime.Caching
+open Kevo.MemoryCache
+
 let append_log str = 
     use f = System.IO.File.AppendText("out.txt")
     f.WriteLine (string str)
