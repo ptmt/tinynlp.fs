@@ -47,19 +47,23 @@ let viterbi
         let loopentries (tagEntry:KeyValuePair<string, float>) (chp:float) = 
                 tag_matrix.Add(new List<TE>())
                 let j = if tag_matrix.Count > 2 then tag_matrix.Count - 2 else 0
-                let new_entry, columnHighestProbCandidate = Seq.fold (fun a t2 -> loopTrigram t2 tagEntry (fst a)) ({Tag = tagEntry.Key; Probs = new Dictionary<TE, float>(); BPS = new Dictionary<TE, TE>()}, chp) tag_matrix.[j]   
-                printfn "%A" columnHighestProbCandidate
+                let new_entry, columnHighestProbCandidate = 
+                    Seq.fold (fun a t2 -> loopTrigram t2 tagEntry (fst a)) 
+                        ({Tag = tagEntry.Key; Probs = new Dictionary<TE, float>(); BPS = new Dictionary<TE, TE>()}, chp) 
+                        tag_matrix.[j]   
+                //printfn "columnHighestProbCandidate %A" columnHighestProbCandidate
                 let c = tag_matrix.Count - 1
                 tag_matrix.[c].Add(new_entry)
                 columnHighestProbCandidate
         let columnHighestProb = System.Double.NegativeInfinity        
         let tagProbs =            
             let a = known_words_tags_probs.TryGetValue(token.ToLower())
+            //printfn "%A for %A" a token
             match a with 
                 | (false, _) -> TinyNLP.POST.Word.getProbsBySuffix (token.ToLower()) suffix_tree corpus_data
                 | (true, tag) -> tag
         let printAndNext ccc = 
-            printfn "%A" ccc
+            //printfn "probs: %A" ccc
             ccc                            
                     
         let t = tagProbs |> printAndNext |> Seq.fold (fun (candidate:float) tagEntry ->  loopentries tagEntry candidate) columnHighestProb
@@ -70,9 +74,15 @@ let viterbi
   //  let start_tag = "<S>"
     let tag_matrix = new TagMatrix()
     tag_matrix.Add(new List<TE>())
-   // tag_matrix.[0].Add({Tag = start_tag; Probs = new Dictionary<TE, double>(); BPS = new Dictionary<TE, TE>() })
-    //{Tag = token_list.[0]; Probs = new Dictionary<TE, double>(); BPS = new Dictionary<TE, TE>() }]]
-    token_list |> List.fold (fun beam x -> viterbi_token x tag_matrix beam) beam_start |> ignore
+    let first_entry = {Tag = token_list.[0]; Probs = new Dictionary<TE, double>(); BPS = new Dictionary<TE, TE>() }
+    tag_matrix.[0].Add(first_entry)
+    tag_matrix.Add(new List<TE>())
+    let bpsinit = new Dictionary<TE, TE>()
+    let probsinit = new Dictionary<TE, double>()
+    //bpsinit.Add (first_entry, null)
+    probsinit.Add(first_entry, 0.0)    
+    tag_matrix.[1].Add({Tag = token_list.[0]; Probs = probsinit; BPS = bpsinit })
+    token_list |> List.tail |> List.fold (fun beam x -> viterbi_token x tag_matrix beam) beam_start |> ignore
     Util.append_log (sprintf "%A" tag_matrix)
     tag_matrix
 
@@ -85,17 +95,31 @@ let highestProbabilitySequence (tag_matrix:TagMatrix) =
             (tag_matrix.[tag_matrix.Count - 1] )
 
     let rec constructSequence tagSeq (tail:TE) (before:TE option) = 
-        let newa = tagSeq @ [tail]
+        let newa = tagSeq @ [tail.Tag]
         if before.IsSome then 
             let new_before_tail = if tail.BPS <> null && tail.BPS.ContainsKey(before.Value) then Some tail.BPS.[before.Value] else None
+            printfn "new_before_tail %A" new_before_tail
             constructSequence newa before.Value new_before_tail
         else
             newa
-    printfn "%A" (constructSequence [] (a1.Value) b1)
+    printfn "%A %A" a1 b1
+    (constructSequence [] (a1.Value) b1)
 
 let printTagMatrix (tag_matrix: TagMatrix) =    
+    let rec printTE (te:TE) (tab:string) = 
+        let tag = "\n" + tab + (sprintf "tag: %A" te.Tag)
+        let bps:string = 
+            if te.BPS.Count > 0 then
+                "\n" + tab + sprintf "\tbps (count = %A): " te.BPS.Count + Seq.fold (fun a (x:KeyValuePair<TE,TE>) -> a + "key: " + x.Key.Tag + " value: " + x.Value.Tag) "" te.BPS 
+            else
+                "\n" + tab + "\tbps empty"
+        let probs:string = 
+            if te.Probs.Count > 0 then
+                "\n" + tab + "\tprobs:" +  Seq.fold (fun a (x:KeyValuePair<TE,float>) -> a + "key: " + x.Key.Tag + " value: " + (string x.Value)) "" te.Probs 
+            else "\n" + tab + "\tprobs empty"
+        (tag + bps + probs)
     let empty_string = ""
-    Seq.fold (fun s x -> s + "\t" + Seq.fold (fun a y -> a + (sprintf "\t\t%A" y)) empty_string x) empty_string  tag_matrix
+    Seq.fold (fun s x -> s + "\t" + Seq.fold (fun a y -> a +  (printTE y "\t")) empty_string x) empty_string  tag_matrix
 //    // Find the most probably final state.
 //		double highestProb = Double.NEGATIVE_INFINITY;
 //		TagMatrixEntry tail = null;
