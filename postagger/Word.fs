@@ -21,11 +21,14 @@ let getWordProbs (corpus_data:CorpusData) =
 
 let getProbsBySuffix (token:string) (suffix_tree:SuffixTree) (corpus_data:CorpusData)=    
    let maxTags = 10
+   //let timer = new System.Diagnostics.Stopwatch()    
+   //timer.Start()  
    let prinner_e = new prinner_dict();
    suffixTagProbs token suffix_tree corpus_data 
     |> Seq.sortBy (fun x -> x.Value) 
     //|> Seq.take maxTags
     |> Seq.iter (fun x -> prinner_e.Add(x.Key, x.Value))
+   //printfn "getProbsBySuffix %A in %f ms" token timer.Elapsed.TotalMilliseconds
    prinner_e
      
    

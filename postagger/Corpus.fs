@@ -9,7 +9,8 @@ type CorpusData = {
     Lexicon:Dictionary<string, Dictionary<string, int>>;
     Unigrams:Dictionary<string, int>;
     Bigrams:Dictionary<string, int>;
-    Trigrams:Dictionary<string, int>
+    Trigrams:Dictionary<string, int>;
+    Size:int
     }
 
 // read and parse corpus xml file
@@ -74,7 +75,8 @@ let handleSentence (sentence:TaggedWord list, corpus_data:CorpusData):CorpusData
                 Lexicon = getLexicon (c.Lexicon, sentence.[i]);
                 Unigrams =  incDict (c.Unigrams, (snd sentence.[i]));
                 Bigrams =  getBigrams;
-                Trigrams = getTrigrams;}
+                Trigrams = getTrigrams;
+                Size = c.Size + sentence.Length}
             handleWord (corpusd , i+1)  
 
     handleWord (corpus_data, 0)
@@ -89,5 +91,6 @@ let readCorpus (input:System.IO.StreamReader) =
                 {Lexicon =  new Dictionary<string, Dictionary<string, int>>(); 
                 Unigrams =  new Dictionary<string, int>(); 
                 Bigrams =  new Dictionary<string, int>(); 
-                Trigrams =  new Dictionary<string, int>()}
+                Trigrams =  new Dictionary<string, int>();
+                Size = 0}
 

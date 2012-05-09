@@ -48,15 +48,15 @@ let calculateLambdas (corpus:CorpusData) =
         ] |> List.maxBy (fun x -> fst x) |> snd      
         
 
-    let corpus_size = Seq.fold (fun accum x -> accum + x) 0 corpus.Unigrams.Values 
-    let ls = corpus.Trigrams |> Seq.fold (fun accum x -> sumTuples (processTrigram (string x.Key, x.Value) corpus_size) accum) (0, 0, 0)
+    //let corpus_size = Seq.fold (fun accum x -> accum + x) 0 corpus.Unigrams.Values 
+    let ls = corpus.Trigrams |> Seq.fold (fun accum x -> sumTuples (processTrigram (string x.Key, x.Value) corpus.Size) accum) (0, 0, 0)
     normalizeLambdas ls
 
 let trigramProb (trigram:string) (corpus_data:CorpusData) = 
-    let corpus_size = Seq.fold (fun accum x -> accum + x) 0 corpus_data.Unigrams.Values 
+    //let corpus_size = Seq.fold (fun accum x -> accum + x) 0 corpus_data.Unigrams.Values 
     let t1t2t3 = trigram.Split [|delimeterChar|]
     let t3 = t1t2t3.[2]
-    let t3prob = if corpus_data.Unigrams.ContainsKey(t3) then float corpus_data.Unigrams.[t3] / float corpus_size else 0.0
+    let t3prob = if corpus_data.Unigrams.ContainsKey(t3) then float corpus_data.Unigrams.[t3] / float corpus_data.Size else 0.0
     //printfn "t3prob = %A" t3prob
     let t2t3 = t1t2t3.[1] + TinyNLP.POST.Corpus.delimiter + t1t2t3.[2]
     let t2t3prob = 
@@ -72,7 +72,7 @@ let trigramProb (trigram:string) (corpus_data:CorpusData) =
         else 
             0.0
     //printfn "t1t2t3prob = %A" t1t2t3prob
-    let lambda1, lambda2, lambda3 = calculateLambdas corpus_data
+    let lambda1, lambda2, lambda3 = Kevo.Store.memo<(float*float*float)> (fun () -> calculateLambdas corpus_data)
     System.Math.Log (lambda1 * t3prob + lambda2 * t2t3prob + lambda3 * t1t2t3prob)
 //public double triGramProb(TriGram triGram) {
 //		// If we have cached the likelihood for this trigram, return it.

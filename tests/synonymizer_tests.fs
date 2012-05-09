@@ -4,6 +4,10 @@ open NUnit.Framework
 open TinyNLP
 open TinyNLP.Tests.Helpers
 
+
+[<Test>]
+let ``stemming should make lower case of word`` () =
+    TinyNLP.Stemming.Stem "Слово" |> fun x -> x = "слов" |> shouldBeTrue
  
 [<Test>]
 let ``synonymizer should not be able to synonymize usual unstemmed word`` () =
@@ -15,4 +19,4 @@ let ``synonymizer should not be able to synonymize unknown word`` () =
 
 [<Test>]
 let ``synonymizer should be able to synonymize stemmed word`` () =
-    TinyNLP.Synonymizer.getSynonyms (TinyNLP.Stemming.Stem "слово") |> fun x -> x.Length > 1 |> shouldBeTrue
+    TinyNLP.Synonymizer.getSynonyms (TinyNLP.Stemming.Stem "слово") |> fun x -> x.Length > 0 |> shouldBeTrue

@@ -37,7 +37,7 @@ let inline isEnd word =
     let matches = RegexMatches(word, c_rvre)
     matches.Count < 1
 
-let step1 word = 
+let inline step1 word = 
     let a = RegexReplace (word, c_perfectiveground, empty_string)
     match a with 
         | (false, w) -> w
@@ -51,16 +51,16 @@ let step1 word =
                         | (true, w2) -> snd(RegexReplace(w2, c_noun, empty_string))
                         | (false, w2) -> w2
 
-let step2 word = 
+let inline step2 word = 
     snd(RegexReplace(word, c_i, empty_string))
 
-let step3 word =
+let inline step3 word =
     let m = RegexMatch(word, c_derivational)
     match m.Success with
         | true -> snd(RegexReplace(word, c_ost, empty_string))
         | _ -> word
 
-let step4 word =
+let inline step4 word =
      let m = RegexReplace(word, "ь$", empty_string)
      match m with
         | (false, w) -> w

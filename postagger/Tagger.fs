@@ -32,8 +32,12 @@ let viterbi
                         (highestProb, highestProbBp)
                     else
                         let trigram = t1.Key.Tag + TinyNLP.POST.Corpus.delimiter + t2.Tag + TinyNLP.POST.Corpus.delimiter + tagEntry.Key
+                        // TODO: Async logger
+                        //let timer = new System.Diagnostics.Stopwatch()    
+                        //timer.Start()  
                         let tProb = TinyNLP.POST.Model.trigramProb trigram corpus_data
-                        //printfn "tProb = %A" tProb
+                        //printfn "tProb %A in %f ms" token timer.Elapsed.TotalMilliseconds
+                        
                         let prob = tProb + t1.Value + tagEntry.Value
                         if prob > highestProb then
                             (prob, t1.Key)
