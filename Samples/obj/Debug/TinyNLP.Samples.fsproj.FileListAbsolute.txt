@@ -21,7 +21,7 @@ D:\projects\tinynlp.fs\Samples\bin\Debug\protobuf-net.pdb
 D:\projects\tinynlp.fs\Samples\bin\Debug\protobuf-net.xml
 D:\projects\tinynlp.fs\Samples\bin\Debug\Newtonsoft.Json.pdb
 D:\projects\tinynlp.fs\Samples\bin\Debug\Newtonsoft.Json.xml
-D:\projects\tinynlp.fs\Samples\bin\Debug\en\FSharp.Core.resources.dll
 D:\projects\tinynlp.fs\Samples\obj\Debug\TinyNLP.Samples.fsprojResolveAssemblyReference.cache
 D:\projects\tinynlp.fs\Samples\obj\Debug\Samples.exe
 D:\projects\tinynlp.fs\Samples\obj\Debug\Samples.pdb
+D:\projects\tinynlp.fs\Samples\bin\Debug\ru\FSharp.Core.resources.dll

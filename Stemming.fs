@@ -1,10 +1,10 @@
 ﻿module TinyNLP.Stemming
 
-open System;
-open System.Collections.Generic;
-open System.Linq;
-open System.Text;
-open System.Text.RegularExpressions;
+open System
+open System.Collections.Generic
+open System.Linq
+open System.Text
+open System.Text.RegularExpressions
 
 let c_vower = "аеиоуыэюя"
 let c_perfectiveground = "((ив|ивши|ившись|ыв|ывши|ывшись)|((?<=[ая])(в|вши|вшись)))$"

@@ -43,7 +43,7 @@ let inline filldict (dict:dict) (a:string) (b:int) =
         dict
            
 
-let mergedict (dict1:dict, dict2:dict) = 
+let mergedict (dict1:dict) (dict2:dict) = 
     let mergein (a:dict) (x:KeyValuePair<string,int>) = 
         if a.ContainsKey (x.Key) then
             a.[x.Key] <- x.Value + a.[x.Key]
@@ -86,7 +86,7 @@ let rec addSuffix (tree:TO, suffix:string, tags:dict) =
                                    {Map=map; Freqs = tags; TotalFreq = sumdict tags}
                         // такая буква уже есть, сливаем хэши 
                         | Some subNode ->                                     
-                                   let mergedTags = mergedict (tags, subNode.Freqs)
+                                   let mergedTags = mergedict tags subNode.Freqs
                                    {Map=tree.Map; Freqs = mergedTags; TotalFreq = sumdict mergedTags}
 
 //let emptydict = new dict()

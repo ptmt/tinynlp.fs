@@ -25,16 +25,29 @@ type WordItem (word : string, wordst : string, suff : string, part : LexicalClas
     override x.ToString() = x.Word
  end  
 
- 
+let matchTagByPart (tag:string) = 
+    match tag with 
+        | "ADVB" -> LexicalClass.Adverb    
+        | "NOUN" -> LexicalClass.Noun
+        | "VERB" | "INFN" -> LexicalClass.Verb
+        | "PRTF" | "ADJF" -> LexicalClass.Adjective
+        | _ -> LexicalClass.Others
 
- let getSynonyms for_word =
+
+let getSynonyms for_word tag =
     let query (x:WordItem) =
         x.Wordst = for_word
     let getWord id = 
         let witem = Kevo.Store.findById<WordItem> id
         match witem with
-            | None -> empty_string
-            | _ -> witem.Value.Word
+            | None -> (empty_string, LexicalClass.Others)
+            | _ -> (witem.Value.Word, witem.Value.Part)
+
     let getRelations (word_ids: int array) =
-        word_ids |> Array.map (fun x -> getWord x) |> List.ofArray
+        word_ids 
+        |> Array.map (fun x -> getWord x)         
+        |> Array.filter (fun x -> 
+            (matchTagByPart tag) = snd x) 
+        |> List.ofArray 
+        |> List.map (fun x -> fst x)
     Kevo.Store.findByQuery<WordItem> query |> List.collect (fun x -> getRelations x.Syn) 
