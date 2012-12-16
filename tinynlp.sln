@@ -7,6 +7,12 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "postagger", "src\app\postag
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TinyNLP.Tests", "src\test\TinyNLP.Tests.fsproj", "{549886F0-A0DD-4290-ACFA-1C3F09E5ECB6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "txt", "txt", "{792EADD3-A7B7-418E-AC3F-0B0A6794CC20}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.md = LICENSE.md
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -8,5 +8,7 @@ TinyNLP.Tokenizer.tokenize "слово - не воробей"
 
 TinyNLP.Tokenizer.tokenize "слово не воробей"
 
+TinyNLP.Tokenizer.tokenize "слово | не воробей"
+
 TinyNLP.Tokenizer.tokenize "(слово/выражение) не воробей"
 

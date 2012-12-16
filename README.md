@@ -1,7 +1,8 @@
 #TinyNLP.fs
 
-Small library for Natural Language Processing written in F#. Current language is only Russian.
+Small Natural Language Processing library written in F#. Current supported language is only Russian.
 
 - Tokenizer with combinators using FParsec
 - Synonymizing with KeVo.database
 - Stemming algorithm
+- POSTagger (viterbi) using Russian Open Corpus
