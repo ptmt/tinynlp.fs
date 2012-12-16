@@ -38,6 +38,7 @@
     <Compile Include="test_helpers.fs" />
     <Compile Include="tokenizer_tests.fs" />
     <Compile Include="synonymizer_tests.fs" />
+    <None Include="interactive.fsx" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -66,8 +67,13 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TinyNLP.fs.fsproj">
-      <Name>TinyNLP.fs</Name>
+    <ProjectReference Include="..\app\postagger\postagger.fsproj">
+      <Name>postagger</Name>
+      <Project>{174b13db-703e-4db7-a49d-1db7c0c6e967}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\app\tinynlp.fsproj">
+      <Name>tinynlp</Name>
       <Project>{514f5744-17b0-4726-8976-77491f11cc0a}</Project>
       <Private>True</Private>
     </ProjectReference>

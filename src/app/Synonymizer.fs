@@ -3,6 +3,7 @@
 open ProtoBuf
 open Kevo.Store
 
+
 type LexicalClass =
     | Noun = 1 // существительное
     | Verb = 2 // глагол
