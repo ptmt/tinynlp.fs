@@ -31,7 +31,7 @@ let ``tokenizer should be able to tokenize three simple words with one comma`` (
 
 [<Test>]
 let ``tokenizer should be able to tokenize New York`` () =
-    TinyNLP.Tokenizer.tokenize "Нью-Йорк" |> fun x -> x.Value.Length = 1 |> shouldBeTrue
+    TinyNLP.Tokenizer.tokenize "Нью-Йорк" |> fun x -> x.Value.Length = 2 |> shouldBeTrue
 
 [<Test>]
 let ``tokenizer should be able to tokenize word with dash`` () =
@@ -43,9 +43,9 @@ let ``tokenizer should be able to tokenize word with parenthesis and slashes`` (
 
 [<Test>]
 let ``tokenizer should be able to tokenize sentences`` () =
-    TinyNLP.Tokenizer.splitSentences "Привет. Как дела? Хорошо!" |> fun x -> x.Length = 3 |> shouldBeTrue
+    TinyNLP.Tokenizer.splitSentences "Привет. Как дела? Хорошо!" |> fun x -> x.Length = 4 |> shouldBeTrue
 
 [<Test>]
 let ``tokenizer should be able to tokenize difficult sentences`` () =
-    TinyNLP.Tokenizer.splitSentences "Что бы мне такого сделать на сто миллионов? Ну что-то. Ничего! совсем — даже (ни в коем случае) и не пытайся" |> fun x -> x.Length = 2 |> shouldBeTrue
+    TinyNLP.Tokenizer.splitSentences "Что бы мне такого сделать на сто миллионов? Ну что-то. Ничего! совсем — даже (ни в коем случае) и не пытайся" |> fun x -> x.Length = 4 |> shouldBeTrue
     
